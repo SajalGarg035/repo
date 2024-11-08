@@ -1,0 +1,98 @@
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import Login from "./components/auth/Login";
+import Register from "./components/auth/Register";
+import StudentDashboard from "./components/student/StudentDashboard";
+import ProfessorDashboard from "./components/professor/ProfessorDashboard";
+import StudentList from "./components/professor/StudentList";
+import AdminDashboard from "./components/admin/AdminDashboard";
+import Navbar from "./components/common/Navbar";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+
+const PrivateRoute = ({ children, roles }) => {
+  const { user, isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  if (roles && !roles.includes(user.role)) {
+    return <Navigate to="/" />;
+  }
+
+  return children;
+};
+
+const App = () => {
+  return (
+    <AuthProvider>
+      <Router>
+        {/* Main Wrapper with Tailwind for min-height and background */}
+        <div className="min-h-screen bg-gray-100 d-flex flex-column">
+          <Navbar />
+          <div className="">
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route
+                path="/student/dashboard"
+                element={
+                  <PrivateRoute roles={["student"]}>
+                    <StudentDashboard />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/professor/dashboard"
+                element={
+                  <PrivateRoute roles={["professor"]}>
+                    <ProfessorDashboard />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/professor/student"
+                element={
+                  <PrivateRoute roles={["professor"]}>
+                    <StudentList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <PrivateRoute roles={["admin"]}>
+                    <AdminDashboard />
+                  </PrivateRoute>
+                }
+              />
+            </Routes>
+          </div>
+          {/* Toast notifications */}
+          <ToastContainer
+            position="top-center"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="colored"
+          />
+        </div>
+      </Router>
+    </AuthProvider>
+  );
+};
+
+export default App;

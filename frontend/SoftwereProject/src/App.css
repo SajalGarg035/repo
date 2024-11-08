@@ -1,0 +1,259 @@
+.professor-dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .create-schedule, .schedules-list {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .form-group-row {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .form-group-row .form-group {
+    flex: 1;
+  }
+  
+  .submit-btn, .update-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+  
+  .submit-btn:hover, .update-btn:hover {
+    background-color: #45a049;
+  }
+  
+  .schedule-item {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .schedule-item h3 {
+    margin-top: 0;
+    color: #333;
+  }
+  
+  .enrolled-students {
+    margin-top: 10px;
+  }
+  
+  .enrolled-students h4 {
+    margin-bottom: 5px;
+    color: #555;
+  }
+  
+  .enrolled-students ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  
+  .enrolled-students li {
+    margin-bottom: 3px;
+  }
+  
+  .student-list {
+    margin-top: 15px;
+  }
+  
+  .student-list h3 {
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .student-list-container {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .student-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  
+  .student-item input[type="checkbox"] {
+    margin-right: 10px;
+  }
+  
+  @media (max-width: 768px) {
+    .form-group-row {
+      flex-direction: column;
+    }
+  }.professor-attendance {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: semibold;
+    margin-bottom: 15px;
+  }
+  
+  .class-selection {
+    margin-bottom: 30px;
+  }
+  
+  .schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .schedule-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .schedule-card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .schedule-card.selected {
+    border-color: #007bff;
+    background-color: #f0f8ff;
+  }
+  
+  .class-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .section-info, .schedule-info {
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .attendance-section {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+  }
+  
+  .attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .attendance-table th, .attendance-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+  }
+  
+  .attendance-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  
+  .attendance-checkbox {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .save-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .save-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .error-fallback {
+    background-color: #ffebee;
+    border: 1px solid #ffcdd2;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .try-again-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .try-again-btn:hover {
+    background-color: #d32f2f;
+  }
+  
+  @media (max-width: 768px) {
+    .schedule-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .attendance-table {
+      font-size: 0.9rem;
+    }
+  }
