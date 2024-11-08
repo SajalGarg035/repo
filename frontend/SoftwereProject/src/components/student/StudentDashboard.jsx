@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
-import { toast } from 'react-toastify';
+import { Calendar, Clock, User, Book, CheckCircle, XCircle } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import ProfileEdit from './ProfileEdit';
 
 const StudentDashboard = () => {
@@ -12,13 +12,14 @@ const StudentDashboard = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/student/dashboard', {
+        const response = await fetch('http://localhost:3000/api/student/dashboard', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setSchedules(response.data.schedules);
-        setStudentInfo(response.data.student);
+        const data = await response.json();
+        setSchedules(data.schedules);
+        setStudentInfo(data.student);
       } catch (error) {
-        toast.error('Failed to fetch dashboard data');
+        console.error('Failed to fetch dashboard data');
       }
     };
     fetchDashboard();
@@ -29,59 +30,124 @@ const StudentDashboard = () => {
   };
 
   return (
-    <div className="container mx-auto my-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white shadow-md rounded-lg p-6">
-          <h2 className="text-2xl font-bold mb-4">Student Information</h2>
-          {studentInfo && (
-            <div>
-              <p className="text-gray-700 mb-2">
-  Photo: <img src={studentInfo.photo} alt="Student photo" className="w-20 h-20 rounded-full" />
-  photo: {studentInfo.photo}
-</p>
-
-              <p className="text-gray-700 mb-2">
-                Name: {studentInfo.firstName} {studentInfo.lastName}
-              </p>
-              <p className="text-gray-700 mb-2">Section: {studentInfo.section}</p>
-              <p className="text-gray-700 mb-2">
-                Enrollment Date: {new Date(studentInfo.enrollmentDate).toLocaleDateString()}
-              </p>
-              <div className="mt-4">
-                <ProfileEdit studentInfo={studentInfo} onUpdate={handleProfileUpdate} />
-              </div>
-            </div>
-          )}
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Student Dashboard</h1>
+          <p className="mt-2 text-gray-600">Welcome back, {studentInfo?.firstName}!</p>
         </div>
-        <div className="bg-white shadow-md rounded-lg p-6">
-          <h2 className="text-2xl font-bold mb-4">Class Schedules</h2>
-          <div className="space-y-4">
-            {schedules.map((schedule) => (
-              <div key={schedule._id} className="bg-gray-100 rounded-lg p-4 shadow-sm">
-                <h3 className="text-lg font-medium mb-2">{schedule.className}</h3>
-                <p className="text-gray-700 mb-1">Section: {schedule.section}</p>
-                <p className="text-gray-700 mb-1">Professor: {schedule.professorId.username}</p>
-                <p className="text-gray-700 mb-1">
-                  Schedule: {schedule.schedule.day} {schedule.schedule.startTime} - {schedule.schedule.endTime}
-                </p>
-                <h4 className="text-medium font-medium mt-4">Attendance</h4>
-                <div className="space-y-2">
-                  {studentInfo?.attendance
-                    ?.filter((attendance) => attendance.classId._id === schedule._id)
-                    .map((attendance) => (
-                      <div key={attendance._id} className="bg-white rounded-lg p-2 shadow-sm">
-                        <p className="text-gray-700">
-                          Date: {new Date(attendance.date).toLocaleDateString()}
-                        </p>
-                        <p className="text-gray-700">
-                          Present: {attendance.present.toString()}
-                        </p>
-                      </div>
-                    ))}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Student Profile Card */}
+          <Card className="lg:col-span-1">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="w-5 h-5" />
+                Profile Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {studentInfo && (
+                <div className="space-y-6">
+                  <div className="flex justify-center">
+                    <div className="relative">
+                      <img
+                        src={studentInfo.photo}
+                        alt="Student"
+                        className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
+                      />
+                      
+                      <span className="absolute bottom-0 right-0 h-4 w-4 bg-green-400 rounded-full border-2 border-white"></span>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {studentInfo.firstName} {studentInfo.lastName}
+                      <p>{studentInfo.photo}</p>
+                    </h3>
+                    <p className="text-gray-500">Section {studentInfo.section}</p>
+                  </div>
+                  <div className="pt-4 border-t border-gray-200">
+                    <div className="flex items-center gap-2 text-gray-600 mb-2">
+                      <Calendar className="w-4 h-4" />
+                      <span>Enrolled: {new Date(studentInfo.enrollmentDate).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                  <ProfileEdit studentInfo={studentInfo} onUpdate={handleProfileUpdate} />
                 </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Schedule Card */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Book className="w-5 h-5" />
+                Class Schedules
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {schedules.map((schedule) => (
+                  <div
+                    key={schedule._id}
+                    className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                  >
+                    <div className="p-4 bg-gray-50 border-b border-gray-200">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-lg font-semibold text-gray-900">{schedule.className}</h3>
+                        <span className="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                          {schedule.section}
+                        </span>
+                      </div>
+                      <div className="mt-2 flex items-center gap-4 text-gray-600">
+                        <div className="flex items-center gap-1">
+                          <User className="w-4 h-4" />
+                          <span>{schedule.professorId.username}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          <span>
+                            {schedule.schedule.day} {schedule.schedule.startTime} - {schedule.schedule.endTime}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {studentInfo?.attendance
+                      ?.filter((attendance) => attendance.classId._id === schedule._id)
+                      .map((attendance) => (
+                        <div
+                          key={attendance._id}
+                          className="p-3 flex items-center justify-between border-b last:border-b-0 hover:bg-gray-50"
+                        >
+                          <div className="flex items-center gap-3">
+                            {attendance.present ? (
+                              <CheckCircle className="w-5 h-5 text-green-500" />
+                            ) : (
+                              <XCircle className="w-5 h-5 text-red-500" />
+                            )}
+                            <span className="text-gray-600">
+                              {new Date(attendance.date).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <span
+                            className={`px-2 py-1 rounded-full text-sm ${
+                              attendance.present
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-red-100 text-red-800'
+                            }`}
+                          >
+                            {attendance.present ? 'Present' : 'Absent'}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

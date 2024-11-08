@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { User, Mail, Lock, Calendar, Upload, UserCircle } from 'lucide-react';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -13,9 +13,8 @@ const Register = () => {
     firstName: '',
     lastName: '',
     dateOfBirth: '',
-    photo:'',
+    photo: '',
   });
-  // const [photo, setPhoto] = useState(null);
 
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -32,182 +31,192 @@ const Register = () => {
   };
 
   return (
-    <div className="App">
-      <style>
-        {`
-        .App {
-          text-align: center;
-          background-image: url("https://codetheweb.blog/assets/img/posts/css-advanced-background-images/cover.jpg");
-          background-size: cover;
-          background-position: center;
-          background-repeat: no-repeat;
-          height: 100vh;
-        }
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl mx-auto">
+        {/* Card Container */}
+        <div className="bg-white rounded-xl shadow-lg">
+          {/* Header */}
+          <div className="bg-indigo-600 rounded-t-xl px-6 py-4">
+            <h2 className="text-2xl font-bold text-white text-center">Create Your Account</h2>
+          </div>
 
-        .card {
-          max-width: 500px;
-          width: 100%;
-          margin: 0 auto;
-          margin-top: 50px;
-          background-color: rgba(248, 249, 250, 0.7);
-          border-radius: 10px;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+          {/* Form Section */}
+          <div className="p-6 sm:p-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Basic Info Section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-1">
+                  <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                    Username
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <User className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      id="username"
+                      value={formData.username}
+                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      required
+                    />
+                  </div>
+                </div>
 
-        .card-header {
-          background-color: #007bff;
-          color: white;
-        }
+                <div className="space-y-1">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Mail className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="email"
+                      id="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
 
-        .card-body {
-          padding: 30px;
-        }
+              {/* Password & Role Section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-1">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="password"
+                      id="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      required
+                    />
+                  </div>
+                </div>
 
-        .form-group {
-          margin-bottom: 20px;
-        }
+                <div className="space-y-1">
+                  <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                    Role
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <UserCircle className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <select
+                      id="role"
+                      value={formData.role}
+                      onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                      <option value="student">Student</option>
+                      <option value="professor">Professor</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
 
-        .form-label {
-          font-weight: bold;
-          color: #333;
-        }
-
-        .form-control {
-          padding: 10px;
-          font-size: 16px;
-          border: 1px solid #ced4da;
-          border-radius: 5px;
-        }
-
-        .form-control:focus {
-          border-color: #80bdff;
-          box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        }
-
-        .btn-primary {
-          width: 100%;
-          font-size: 18px;
-          font-weight: bold;
-          background-color: #007bff;
-          border: none;
-        }
-
-        .btn-primary:hover {
-          background-color: #0056b3;
-        }
-        `}
-      </style>
-
-      <div className="card shadow-lg">
-        <div className="card-header">
-          <h4 className="mb-0">Register</h4>
-        </div>
-        <div className="card-body">
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="username" className="form-label">Username</label>
-              <input
-                type="text"
-                id="username"
-                className="form-control"
-                value={formData.username}
-                onChange={(e) =>
-                  setFormData({ ...formData, username: e.target.value })
-                }
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="email" className="form-label">Email</label>
-              <input
-                type="email"
-                id="email"
-                className="form-control"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="password" className="form-label">Password</label>
-              <input
-                type="password"
-                id="password"
-                className="form-control"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="password" className="form-label">Password</label>
-              <input
-                type="file"
-                value={formData.photo}
-                onChange={(e) =>
-                  setFormData({ ...formData, photo: e.target.value })
-                }
-              />
-            </div>
-            <div className="form-group">
-              
-              <label htmlFor="role" className="form-label">Role</label>
-              <select
-                id="role"
-                className="form-control"
-                value={formData.role}
-                onChange={(e) =>
-                  setFormData({ ...formData, role: e.target.value })
-                }
-              >
-                <option value="student">Student</option>
-                <option value="professor">Professor</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
-            {formData.role === 'student' && (
-              <>
-                <div className="form-group">
-                  <label htmlFor="firstName" className="form-label">First Name</label>
+              {/* Photo Upload Section */}
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">Profile Photo</label>
+                <div className="mt-1 flex items-center space-x-4">
+                  <div className="flex-shrink-0">
+                    <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
+                      <Upload className="h-6 w-6 text-gray-400" />
+                    </div>
+                  </div>
                   <input
-                    type="text"
-                    id="firstName"
-                    className="form-control"
-                    value={formData.firstName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, firstName: e.target.value })
-                    }
+                    type="file"
+                    onChange={(e) => setFormData({ ...formData, photo: e.target.value })}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                   />
                 </div>
-                <div className="form-group">
-                  <label htmlFor="lastName" className="form-label">Last Name</label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    className="form-control"
-                    value={formData.lastName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, lastName: e.target.value })
-                    }
-                  />
+              </div>
+
+              {/* Conditional Student Fields */}
+              {formData.role === 'student' && (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-1">
+                      <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        id="firstName"
+                        value={formData.firstName}
+                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        id="lastName"
+                        value={formData.lastName}
+                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700">
+                      Date of Birth
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Calendar className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="date"
+                        id="dateOfBirth"
+                        value={formData.dateOfBirth}
+                        onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label htmlFor="dateOfBirth" className="form-label">Date of Birth</label>
-                  <input
-                    type="date"
-                    id="dateOfBirth"
-                    className="form-control"
-                    value={formData.dateOfBirth}
-                    onChange={(e) =>
-                      setFormData({ ...formData, dateOfBirth: e.target.value })
-                    }
-                  />
-                </div>
-              </>
-            )}
-            <button type="submit" className="btn btn-primary">Register</button>
-          </form>
+              )}
+
+              {/* Submit Button */}
+              <div>
+                <button
+                  type="submit"
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                >
+                  Create Account
+                </button>
+              </div>
+
+              {/* Login Link */}
+              <div className="text-center text-sm">
+                <span className="text-gray-500">Already have an account?</span>{' '}
+                <a
+                  href="/login"
+                  className="font-medium text-indigo-600 hover:text-indigo-500"
+                >
+                  Sign in
+                </a>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
