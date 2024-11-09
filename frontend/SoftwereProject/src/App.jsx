@@ -8,6 +8,7 @@ import {
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
+import ForgotPassword from "./components/auth/Resetpassword";
 import StudentDashboard from "./components/student/StudentDashboard";
 import ProfessorDashboard from "./components/professor/ProfessorDashboard";
 import StudentList from "./components/professor/StudentList";
@@ -16,6 +17,7 @@ import Navbar from "./components/common/Navbar";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import MarkAttendance from "./components/admin/Mark_attendance";
 
 const PrivateRoute = ({ children, roles }) => {
   const { user, isAuthenticated } = useAuth();
@@ -74,6 +76,12 @@ const App = () => {
                   </PrivateRoute>
                 }
               />
+              <Route 
+                path = "/ForgotPassword"
+                element = {
+                  <ForgotPassword></ForgotPassword>
+                }
+                />
             </Routes>
           </div>
           {/* Toast notifications */}

@@ -1,136 +1,38 @@
-'use client'
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "react-toastify";
+import { PencilIcon, TrashIcon, X } from "lucide-react";
 
-import React, { useState, useEffect } from "react"
-import axios from "axios"
-import { useAuth } from "@/context/AuthContext"
-import { toast } from "react-toastify"
-
-const styles = {
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '20px',
-  },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: '8px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    padding: '20px',
-  },
-  header: {
-    marginBottom: '20px',
-  },
-  title: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    marginBottom: '8px',
-  },
-  description: {
-    color: '#666',
-    fontSize: '14px',
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-  },
-  th: {
-    textAlign: 'left',
-    padding: '12px',
-    borderBottom: '2px solid #eee',
-    fontWeight: 'bold',
-  },
-  td: {
-    padding: '12px',
-    borderBottom: '1px solid #eee',
-  },
-  button: {
-    padding: '8px 12px',
-    borderRadius: '4px',
-    border: 'none',
-    cursor: 'pointer',
-    marginRight: '8px',
-  },
-  editButton: {
-    backgroundColor: '#4CAF50',
-    color: 'white',
-  },
-  deleteButton: {
-    backgroundColor: '#f44336',
-    color: 'white',
-  },
-  modal: {
-    position: 'fixed',
-    top: '0',
-    left: '0',
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: '20px',
-    borderRadius: '8px',
-    width: '90%',
-    maxWidth: '500px',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-  },
-  formGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  label: {
-    marginBottom: '4px',
-    fontWeight: 'bold',
-  },
-  input: {
-    padding: '8px',
-    borderRadius: '4px',
-    border: '1px solid #ccc',
-  },
-  buttonGroup: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    gap: '8px',
-    marginTop: '16px',
-  },
-}
-
-export default function AdminDashboard() {
-  const [students, setStudents] = useState([])
-  const [editingStudent, setEditingStudent] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const { token } = useAuth()
+const AdminDashboard = () => {
+  const [students, setStudents] = useState([]);
+  const [editingStudent, setEditingStudent] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { token } = useAuth();
 
   useEffect(() => {
-    fetchStudents()
-  }, [token])
+    fetchStudents();
+  }, [token]);
 
   const fetchStudents = async () => {
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
     try {
       const response = await axios.get("http://localhost:3000/api/admin/students", {
         headers: { Authorization: `Bearer ${token}` },
-      })
-      setStudents(response.data)
+      });
+      setStudents(response.data);
     } catch (error) {
-      setError("Failed to fetch students")
-      toast.error("Failed to fetch students")
+      setError("Failed to fetch students");
+      toast.error("Failed to fetch students");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleEdit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
       await axios.put(
         `http://localhost:3000/api/admin/student/${editingStudent._id}`,
@@ -138,120 +40,206 @@ export default function AdminDashboard() {
         {
           headers: { Authorization: `Bearer ${token}` },
         }
-      )
-      toast.success("Student updated successfully")
-      setEditingStudent(null)
-      fetchStudents()
+      );
+      toast.success("Student updated successfully");
+      setEditingStudent(null);
+      fetchStudents();
     } catch (error) {
-      toast.error("Failed to update student")
+      toast.error("Failed to update student");
     }
-  }
+  };
 
   const handleDelete = async (studentId) => {
     if (window.confirm("Are you sure you want to delete this student?")) {
       try {
-        await axios.delete(`http://localhost:3000/api/admin/student/${studentId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        toast.success("Student deleted successfully")
-        fetchStudents()
+        await axios.delete(
+          `http://localhost:3000/api/admin/student/${studentId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        toast.success("Student deleted successfully");
+        fetchStudents();
       } catch (error) {
-        toast.error("Failed to delete student")
+        toast.error("Failed to delete student");
       }
     }
-  }
+  };
 
   if (isLoading) {
-    return <div style={{ ...styles.container, textAlign: 'center' }}>Loading...</div>
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div style={{ ...styles.container, color: 'red', textAlign: 'center' }}>{error}</div>
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="rounded-lg bg-red-50 p-4 text-red-500">{error}</div>
+      </div>
+    );
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <div style={styles.header}>
-          <h2 style={styles.title}>Student Management</h2>
-          <p style={styles.description}>Manage student information and records</p>
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6 lg:p-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="rounded-xl bg-white p-6 shadow-sm">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">
+              Student Management
+            </h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Manage student information and records
+            </p>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full table-auto">
+              <thead>
+                <tr className="border-b bg-gray-50">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
+                    Name
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
+                    Email
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
+                    Section
+                  </th>
+                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-600">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {students.map((student) => (
+                  <tr
+                    key={student._id}
+                    className="transition-colors hover:bg-gray-50"
+                  >
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-gray-900">
+                        {student.firstName} {student.lastName}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-gray-600">
+                      {student.userId.email}
+                    </td>
+                    <td className="px-4 py-3 text-gray-600">
+                      {student.section}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => setEditingStudent(student)}
+                        className="mr-2 inline-flex items-center rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100"
+                      >
+                        <PencilIcon className="mr-1.5 h-4 w-4" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(student._id)}
+                        className="inline-flex items-center rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-100"
+                      >
+                        <TrashIcon className="mr-1.5 h-4 w-4" />
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.th}>Name</th>
-              <th style={styles.th}>Email</th>
-              <th style={styles.th}>Section</th>
-              <th style={styles.th}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {students.map((student) => (
-              <tr key={student._id}>
-                <td style={styles.td}>{student.firstName} {student.lastName}</td>
-                <td style={styles.td}>{student.userId.email}</td>
-                <td style={styles.td}>{student.section}</td>
-                <td style={styles.td}>
-                  <button
-                    style={{ ...styles.button, ...styles.editButton }}
-                    onClick={() => setEditingStudent(student)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    style={{ ...styles.button, ...styles.deleteButton }}
-                    onClick={() => handleDelete(student._id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
 
       {editingStudent && (
-        <div style={styles.modal}>
-          <div style={styles.modalContent}>
-            <h3 style={{ ...styles.title, marginBottom: '16px' }}>Edit Student</h3>
-            <form onSubmit={handleEdit} style={styles.form}>
-              <div style={styles.formGroup}>
-                <label htmlFor="firstName" style={styles.label}>First Name</label>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="text-xl font-bold text-gray-800">Edit Student</h3>
+              <button
+  onClick={() => setEditingStudent(null)}
+  className="rounded-lg p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+>
+  <X className="h-6 w-6" /> {/* Use X instead of XMarkIcon */}
+</button>
+            </div>
+
+            <form onSubmit={handleEdit} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="firstName"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
+                  First Name
+                </label>
                 <input
                   id="firstName"
-                  style={styles.input}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   value={editingStudent.firstName}
-                  onChange={(e) => setEditingStudent({ ...editingStudent, firstName: e.target.value })}
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      firstName: e.target.value,
+                    })
+                  }
                 />
               </div>
-              <div style={styles.formGroup}>
-                <label htmlFor="lastName" style={styles.label}>Last Name</label>
+
+              <div>
+                <label
+                  htmlFor="lastName"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
+                  Last Name
+                </label>
                 <input
                   id="lastName"
-                  style={styles.input}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   value={editingStudent.lastName}
-                  onChange={(e) => setEditingStudent({ ...editingStudent, lastName: e.target.value })}
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      lastName: e.target.value,
+                    })
+                  }
                 />
               </div>
-              <div style={styles.formGroup}>
-                <label htmlFor="section" style={styles.label}>Section</label>
+
+              <div>
+                <label
+                  htmlFor="section"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
+                  Section
+                </label>
                 <input
                   id="section"
-                  style={styles.input}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   value={editingStudent.section}
-                  onChange={(e) => setEditingStudent({ ...editingStudent, section: e.target.value })}
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      section: e.target.value,
+                    })
+                  }
                 />
               </div>
-              <div style={styles.buttonGroup}>
+
+              <div className="mt-6 flex justify-end space-x-3">
                 <button
                   type="button"
-                  style={{ ...styles.button, backgroundColor: '#ccc' }}
                   onClick={() => setEditingStudent(null)}
+                  className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
                 >
                   Cancel
                 </button>
-                <button type="submit" style={{ ...styles.button, ...styles.editButton }}>
+                <button
+                  type="submit"
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                >
                   Save Changes
                 </button>
               </div>
@@ -260,5 +248,7 @@ export default function AdminDashboard() {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
+
+export default AdminDashboard;

@@ -1,6 +1,9 @@
 // Replace import statements with require
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
+const axios = require('axios');
+
+
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -23,7 +26,14 @@ const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://sajalgarg2006:sajal123@cluster0.urmyxu4.mongodb.net/?retryWrites=true&w=majority";
 const SALT_ROUNDS = 10;
 
-
+app.get('/fetch-attendance', async (req, res) => {
+  try {
+    const response = await axios.get('http://127.0.0.1:8000/get_attendance_json');
+    res.json(response.data);  // Forward data from Flask to the client
+  } catch (error) {
+    res.status(500).send('Error fetching attendance from Flask');
+  }
+});
 
 const CLOUDINARY_CLOUD_NAME="dazaaaymw"
 const CLOUDINARY_API_KEY="437619521957416"
@@ -268,9 +278,9 @@ app.post("/api/register", registerValidation, async (req, res, next) => {
     }
     
     const { username, password, email, role, photo } = req.body;
-    console.log(photo);
-    const result = await cloudinary.uploader.upload(photo);
-    console.log(result);
+    // console.log(photo);
+    // const result = await cloudinary.uploader.upload(photo);
+    // console.log(result);
     // Check if user already exists
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
@@ -938,10 +948,50 @@ app.get("/api/professor/schedule/:id/attendance-report",
       next(error);
     }
 });
+app.get('/mark_attendance', async function(req, res) {
+  try {
+    const response = await axios.get('http://127.0.0.1:8000/get_attendance_json');
+    
+    const data = response.data.final_attendance;
+    console.log(data);
+    // Iterate through each attendance record
+    for (let record of data) {
+      const student = await Student.findOne({ name: record.name }); // Find student by name
+      if (!student) {
+        continue; // Skip if the student is not found
+      }
+
+      // Check if the student has attendance record for the current date
+      const attendance = student.attendance.find(a => a.firstName.toString() === record.name.toString());
+
+      if (!attendance) {
+        // If no attendance record exists, add it
+        student.attendance.push({
+          present: true  // Assuming presence is based on this attendance record
+        });
+
+        // Save the student document
+        await student.save();
+      }
+    }
+
+    // Send success response after processing all records
+    res.status(200).json({ message: 'Attendance marked successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
+
+
+// Route to mark attendance for a student
 
 // ... (Rest of the server code remains the same)
 // Apply error handling middleware
 app.use(errorHandler);
+
+
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
@@ -966,3 +1016,4 @@ server.on('error', (error) => {
   }
   process.exit(1);
 });
+
