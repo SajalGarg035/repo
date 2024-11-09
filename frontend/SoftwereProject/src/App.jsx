@@ -18,6 +18,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import MarkAttendance from "./components/admin/Mark_attendance";
+import LandingPage from "./components/common/initialpage";
 
 const PrivateRoute = ({ children, roles }) => {
   const { user, isAuthenticated } = useAuth();
@@ -44,6 +45,14 @@ const App = () => {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route
+                path="/"
+                element={
+                  
+                    <LandingPage />
+                  
+                }
+              />
               <Route
                 path="/student/dashboard"
                 element={
