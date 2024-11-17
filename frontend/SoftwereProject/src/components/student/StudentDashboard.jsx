@@ -56,6 +56,7 @@ const StudentDashboard = () => {
                         alt="Student"
                         className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
                       />
+                      {console.log(studentInfo)}
                       
                       <span className="absolute bottom-0 right-0 h-4 w-4 bg-green-400 rounded-full border-2 border-white"></span>
                     </div>
@@ -63,7 +64,6 @@ const StudentDashboard = () => {
                   <div className="text-center">
                     <h3 className="text-xl font-semibold text-gray-900">
                       {studentInfo.firstName} {studentInfo.lastName}
-                      <p>{studentInfo.photo}</p>
                     </h3>
                     <p className="text-gray-500">Section {studentInfo.section}</p>
                   </div>

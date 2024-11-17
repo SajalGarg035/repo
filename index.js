@@ -1,50 +1,78 @@
-// Replace import statements with require
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const axios = require('axios');
-
-
-
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const nodemailer = require('nodemailer');
 const express = require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const { body, validationResult } = require('express-validator');
-
-// Configure environment variables
 require('dotenv').config();
-
 const app = express();
+const path = require('path');  // Import the path module
+const fs = require('fs').promises;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
 
-// Constants
+
+
+
+
+
+
+
+const NODE_CODE_SENDING_EMAIL_ADD="maatakamakhya2005@gmail.com"
+const NODE_CODE_SENDING_EMAIL_PASS="ulvdxnotptaazssf"
+
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://sajalgarg2006:sajal123@cluster0.urmyxu4.mongodb.net/?retryWrites=true&w=majority";
+const MONGODB_URI = process.env.MONGODB_URI ||"mongodb+srv://sajalgarg2006:sajal123@cluster0.urmyxu4.mongodb.net/?retryWrites=true&w=majority";
 const SALT_ROUNDS = 10;
-
-app.get('/fetch-attendance', async (req, res) => {
-  try {
-    const response = await axios.get('http://127.0.0.1:8000/get_attendance_json');
-    res.json(response.data);  // Forward data from Flask to the client
-  } catch (error) {
-    res.status(500).send('Error fetching attendance from Flask');
-  }
-});
-
 const CLOUDINARY_CLOUD_NAME="dazaaaymw"
 const CLOUDINARY_API_KEY="437619521957416"
 const CLOUDINARY_API_SECRET="IJm6Pdn2_aH-xaqwNvXkuUHYbN8"
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'user',
+    allowed_formats: ['jpg', 'png', 'jpeg'], 
+    public_id: (req, file) => `user-${Date.now()}`
+  }
+});
+
+const upload = multer({ storage });
 // const MONGO_URI=your_mongodb_uri
 cloudinary.config({
   cloud_name: CLOUDINARY_CLOUD_NAME,
   api_key: CLOUDINARY_API_KEY,
   api_secret: CLOUDINARY_API_SECRET,
 });
-// MongoDB connection with proper error handling
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Middleware
+app.use(cors({
+  origin:'http://localhost:5173',
+  credentials:true,
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE']
+}));
+app.use(express.json());
+
+
 mongoose
   .connect(MONGODB_URI, {
     useNewUrlParser: true,
@@ -58,16 +86,12 @@ mongoose
     process.exit(1);
   });
 
-// Error handler for MongoDB connection errors
 mongoose.connection.on('error', (err) => {
   console.error('MongoDB connection error:', err);
 });
-
-// Models with improved validation
-// MongoDB schema for storing image URLs and metadata
 const imageSchema = new mongoose.Schema({
   imageUrl: String,
-  description: String, // optional metadata
+  description: String,
 });
 const Image = mongoose.model('Image', imageSchema);
 
@@ -100,7 +124,10 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
   },
-  photo: String,
+  photo: {
+    type:String,
+    default: 'default_photo_url' ,
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -131,6 +158,9 @@ const studentSchema = new mongoose.Schema({
   enrollmentDate: {
     type: Date,
     default: Date.now
+  },
+  photo: {
+    type : String, 
   },
   section: String,
   attendance: [{
@@ -269,18 +299,17 @@ const registerValidation = [
   body('role').isIn(['student', 'admin', 'professor'])
 ];
 
-// Authentication Routes with validation
-app.post("/api/register", registerValidation, async (req, res, next) => {
+app.post("/api/register", upload.single('photo'), registerValidation, async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
+    console.log(req.file);
     
-    const { username, password, email, role, photo } = req.body;
-    // console.log(photo);
-    // const result = await cloudinary.uploader.upload(photo);
-    // console.log(result);
+    const { username, password, email, role } = req.body;
+    const photo = req.file.path;
+
     // Check if user already exists
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
@@ -312,7 +341,8 @@ app.post("/api/register", registerValidation, async (req, res, next) => {
         userId: user._id,
         firstName,
         lastName,
-        dateOfBirth: new Date(dateOfBirth)
+        dateOfBirth: new Date(dateOfBirth),
+        photo,
       });
       await student.save();
     }
@@ -330,6 +360,92 @@ app.post("/api/register", registerValidation, async (req, res, next) => {
       token
     });
   } catch (error) {
+    console.error(error); // Helpful during development
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+    next(error); // Call next for centralized error handling, if any
+  }
+});
+
+
+// Modify the diskStorage configuration to handle custom naming
+const diskStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    // Get file extension
+    const ext = path.extname(file.originalname);
+    
+    // Get firstName and lastName from request body
+    const { firstName, lastName } = req.body;
+    
+    if (!firstName || !lastName) {
+      cb(new Error('First name and last name are required'));
+      return;
+    }
+    
+    // Create filename with firstName_lastName format
+    const filename = `${firstName.toLowerCase()}_${lastName.toLowerCase()}${ext}`;
+    cb(null, filename);
+  }
+});
+
+const diskUpload = multer({ storage: diskStorage });
+
+// Modified upload route
+app.post('/api/uploads', diskUpload.single('photo'), async (req, res, next) => {
+  try {
+    const { firstName, lastName } = req.body;
+    
+    // Validate required fields
+    if (!firstName || !lastName) {
+      return res.status(400).json({ 
+        error: 'Missing required fields', 
+        message: 'First name and last name are required' 
+      });
+    }
+
+    // Check if file was uploaded
+    if (!req.file) {
+      return res.status(400).json({ 
+        error: 'No file uploaded',
+        message: 'Please provide a photo'
+      });
+    }
+
+    const file = req.file;
+    const { filename, path: filePath, size } = file;
+    
+    // Create file URL
+    const fileUrl = `${process.env.BASE_URL}/uploads/${filename}`;
+    
+    // Return success response
+    res.json({ 
+      success: true,
+      data: {
+        filename,
+        fileUrl,
+        size,
+        firstName,
+        lastName
+      }
+    });
+
+  } catch (error) {
+    // If there's an error and a file was uploaded, clean it up
+    if (req.file) {
+      try {
+        await fs.unlink(req.file.path);
+      } catch (unlinkError) {
+        console.error('Error deleting file:', unlinkError);
+      }
+    }
+
+    console.error(error);
+    res.status(500).json({ 
+      error: 'Internal server error', 
+      details: error.message 
+    });
     next(error);
   }
 });
@@ -975,6 +1091,9 @@ app.get('/mark_attendance', async function(req, res) {
       }
     }
 
+
+
+
     // Send success response after processing all records
     res.status(200).json({ message: 'Attendance marked successfully' });
   } catch (error) {
@@ -982,6 +1101,9 @@ app.get('/mark_attendance', async function(req, res) {
     res.status(500).json({ error: 'Something went wrong' });
   }
 });
+
+
+
 
 
 
@@ -1001,6 +1123,113 @@ process.on('SIGTERM', () => {
     process.exit(0);
   });
 });
+
+const transport = nodemailer.createTransport({
+  service:'gmail',
+  auth:{
+      user: process.env.NODE_CODE_SENDING_EMAIL_ADD || NODE_CODE_SENDING_EMAIL_ADD,
+      pass: process.env.NODE_CODE_SENDING_EMAIL_PASS || NODE_CODE_SENDING_EMAIL_PASS,
+   }
+});
+var forgotPasswordCodeValidation = 0;
+var forgotPasswordCode = 0;
+app.post('/api/sendfpcode', async(req, res) => {
+  const {email} = req.body;
+ 
+  // console.log(process.env.NODE_CODE_SENDING_EMAIL_PASS);
+
+  try{
+      const user = await User.findOne({email:email});
+      if(!user){
+          return res.status(404).json({success: false, message: "No user with this email found!"})
+      }
+
+      const codeValue = Math.floor(Math.random() * 1000000).toString();
+      let info = await transport.sendMail({
+        from: NODE_CODE_SENDING_EMAIL_ADD,
+        to: user.email,
+        subject: "Forgot Password CODE",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+            <div style="background-color: #4A90E2; padding: 20px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Forgot Password Request</h1>
+            </div>
+            <div style="padding: 20px;">
+              <p style="font-size: 16px; color: #333;">Hello,</p>
+              <p style="font-size: 16px; color: #333;">You requested to reset your password. Use the code below to proceed:</p>
+              <div style="text-align: center; margin: 20px 0;">
+                <p style="display: inline-block; background-color: #F7F9FC; border: 1px solid #4A90E2; border-radius: 4px; padding: 10px 20px; font-size: 24px; color: #4A90E2; letter-spacing: 2px;">
+                  ${codeValue}
+                </p>
+              </div>
+              <p style="font-size: 16px; color: #333;">If you did not request this, please ignore this email or contact support.</p>
+            </div>
+            <div style="background-color: #F1F1F1; padding: 10px; text-align: center; font-size: 12px; color: #888;">
+              <p>© 2024 Your Company. All rights reserved.</p>
+            </div>
+          </div>
+        `
+      });
+      
+
+      // console.log('Email sent:', info);
+
+      if(info.accepted[0] === user.email){
+          user.forgotPasswordCode = codeValue;
+          forgotPasswordCode = codeValue;
+          forgotPasswordCodeValidation = Date.now();
+          user.forgotPasswordCodeValidation = Date.now();
+          await user.save();
+
+          return res.status(200).json({success:true, message:"Forgot password code sent successfully"});
+      }
+      return res.status(400).json({success:false, message:"Password cannot be updated"});
+  }
+  catch(err){
+      console.log("Error while reseting password ", err);
+  }
+})
+
+app.post('/api/verifyfpcode', async(req, res) => {
+  const {email, providedCode, newpassword} = req.body;
+  try{
+      const codeValue = providedCode.toString();
+      const user = await User.findOne({email}).select("+forgotPasswordCode +forgotPasswordCodeValidation");
+
+      if(!user){
+          return res.status(404).json({success: false, message: "No user with this email found!"})
+      }
+      console.log(codeValue);
+      console.log(user.forgotPasswordCode);
+      console.log(user.forgotPasswordCodeValidation);
+      if (codeValue !== user.forgotPasswordCode) {
+        return res.status(400).json({ success: false, message: "Invalid code provided" });
+    }
+    
+
+      if(Date.now() - user.forgotPasswordCodeValidation > 5 * 60 * 1000){
+          return res.status(400).json({success:false, message:"Code has been expired"});
+      }
+
+      if(codeValue === user.forgotPasswordCode){
+          const hashedPassword = await hash(newpassword, 12);
+          user.password = hashedPassword;
+          user.forgotPasswordCode = undefined;
+          user.forgotPasswordCodeValidation = undefined;
+
+          await user.save();
+          return res.status(200).json({success:true, message:"You password has been updated successfully!!", user});
+      }
+      else{
+          return res.status(400).json({success:false, message:"Unexpected error occured!!"});
+      }
+  }
+  catch(err){
+      console.log("Error while trying to reset password ", err);
+  }
+})
+
+
 
 // Start server with error handling
 const PORT = process.env.PORT || 3000;

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import { User, Mail, Lock, Calendar, Upload, UserCircle } from 'lucide-react';
+import axios from 'axios';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -13,38 +14,75 @@ const Register = () => {
     firstName: '',
     lastName: '',
     dateOfBirth: '',
-    photo: '',
   });
+  const [photo, setPhoto] = useState(null); // Separate state for file
+  const [photoPreview, setPhotoPreview] = useState(null); // For image preview
 
   const { register } = useAuth();
+  // const {uploads} = useAuth();
   const navigate = useNavigate();
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPhoto(file);
+      // Create preview URL
+      const previewURL = URL.createObjectURL(file);
+      setPhotoPreview(previewURL);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // const file = e.target.files[0];
     try {
-      await register(formData);
+      const formDataToSend = new FormData();
+      
+      // Append all text fields
+      Object.keys(formData).forEach((key) => {
+        formDataToSend.append(key, formData[key]);
+      });
+      
+      // Append file separately
+      if (photo) {
+        formDataToSend.append('photo', photo);
+      }
+
+      // Make sure your register function is set up to handle FormData
+      await register(formDataToSend);
+      const response = await axios.post('http://localhost:3000/api/uploads', formDataToSend);
+      if(response.status == 200){
+        console.log("sdhajhdfdshfohdf")
+      }
       toast.success('Registration successful!');
       navigate('/login');
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || 'Registration failed');
     }
   };
+
+  // Cleanup preview URL when component unmounts or when new file is selected
+  React.useEffect(() => {
+    return () => {
+      if (photoPreview) {
+        URL.revokeObjectURL(photoPreview);
+      }
+    };
+  }, [photoPreview]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
-        {/* Card Container */}
         <div className="bg-white rounded-xl shadow-lg">
-          {/* Header */}
           <div className="bg-indigo-600 rounded-t-xl px-6 py-4">
             <h2 className="text-2xl font-bold text-white text-center">Create Your Account</h2>
           </div>
 
-          {/* Form Section */}
           <div className="p-6 sm:p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
               {/* Basic Info Section */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Username field */}
                 <div className="space-y-1">
                   <label htmlFor="username" className="block text-sm font-medium text-gray-700">
                     Username
@@ -64,6 +102,7 @@ const Register = () => {
                   </div>
                 </div>
 
+                {/* Email field */}
                 <div className="space-y-1">
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                     Email
@@ -86,6 +125,7 @@ const Register = () => {
 
               {/* Password & Role Section */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Password field */}
                 <div className="space-y-1">
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                     Password
@@ -105,6 +145,7 @@ const Register = () => {
                   </div>
                 </div>
 
+                {/* Role field */}
                 <div className="space-y-1">
                   <label htmlFor="role" className="block text-sm font-medium text-gray-700">
                     Role
@@ -132,13 +173,22 @@ const Register = () => {
                 <label className="block text-sm font-medium text-gray-700">Profile Photo</label>
                 <div className="mt-1 flex items-center space-x-4">
                   <div className="flex-shrink-0">
-                    <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
-                      <Upload className="h-6 w-6 text-gray-400" />
+                    <div className="h-12 w-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                      {photoPreview ? (
+                        <img
+                          src={photoPreview}
+                          alt="Profile preview"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <Upload className="h-6 w-6 text-gray-400" />
+                      )}
                     </div>
                   </div>
                   <input
                     type="file"
-                    onChange={(e) => setFormData({ ...formData, photo: e.target.value })}
+                    accept="image/*"
+                    onChange={handleFileChange}
                     className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                   />
                 </div>

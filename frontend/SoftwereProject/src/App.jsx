@@ -19,6 +19,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import MarkAttendance from "./components/admin/Mark_attendance";
 import LandingPage from "./components/common/initialpage";
+import ResetPassword from "./components/auth/fuc";
 
 const PrivateRoute = ({ children, roles }) => {
   const { user, isAuthenticated } = useAuth();
@@ -89,6 +90,12 @@ const App = () => {
                 path = "/ForgotPassword"
                 element = {
                   <ForgotPassword></ForgotPassword>
+                }
+                />
+                <Route
+                path="/ResetPassword"
+                element = {
+                  <ResetPassword></ResetPassword>
                 }
                 />
             </Routes>

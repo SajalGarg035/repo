@@ -39,6 +39,15 @@ export const AuthProvider = ({ children }) => {
       throw new Error(error.response?.data?.error || 'Registration failed');
     }
   };
+  const uploads = async (userData) => {
+  try{
+    const response = await axios.post('http://localhost:3000/api/uploads', userData);
+    return response.data;
+  }
+  catch (error) {
+    throw new Error(error.response?.data?.error || 'photo failed');
+  }
+};
 
   const logout = () => {
     setUser(null);

@@ -88,7 +88,7 @@ const Login = () => {
               </label>
             </div>
             <div className="text-sm">
-              <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
+              <a href="/ForgotPassword" className="font-medium text-indigo-600 hover:text-indigo-500">
                 Forgot your password?
               </a>
             </div>
@@ -106,7 +106,7 @@ const Login = () => {
         {/* Sign Up Link */}
         <div className="text-center text-sm">
           <span className="text-gray-500">Don't have an account?</span>{' '}
-          <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
+          <a href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
             Sign up
           </a>
         </div>
