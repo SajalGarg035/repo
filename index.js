@@ -370,7 +370,7 @@ app.post("/api/register", upload.single('photo'), registerValidation, async (req
 // Modify the diskStorage configuration to handle custom naming
 const diskStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, '/home/sajal/Music/SE-project-master (2)/known_faces/');
   },
   filename: (req, file, cb) => {
     // Get file extension
@@ -394,6 +394,10 @@ const diskUpload = multer({ storage: diskStorage });
 
 // Modified upload route
 app.post('/api/uploads', diskUpload.single('photo'), async (req, res, next) => {
+  const {role} = req.body;
+  if(role !='student'){
+    return res.status(200).json({ error: 'continue' });
+  }
   try {
     const { firstName, lastName } = req.body;
     
