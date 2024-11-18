@@ -43,6 +43,11 @@ const Register = () => {
       }
 
       await register(formDataToSend);
+      if(formDataToSend.role == 'student'){
+        const response = await axios.post('http://localhost:3000/api/uploads', formDataToSend);
+        if(response.status == 200){
+          console.log("sdhajhdfdshfohdf")
+        }}
       toast.success('Registration successful!');
       navigate('/login');
     } catch (error) {
