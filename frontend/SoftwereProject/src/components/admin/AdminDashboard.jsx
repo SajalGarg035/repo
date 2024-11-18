@@ -2,17 +2,31 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
-import { PencilIcon, TrashIcon, X } from "lucide-react";
+import {
+  PencilIcon,
+  TrashIcon,
+  X,
+  Mail,
+  UserCircle,
+  Users,
+  LayoutDashboard,
+  GraduationCap,
+  ChevronRight
+} from "lucide-react";
+import { Card, CardContent } from "../ui/Card";
 
 const AdminDashboard = () => {
   const [students, setStudents] = useState([]);
+  const [professors, setProfessors] = useState([]);
   const [editingStudent, setEditingStudent] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeView, setActiveView] = useState('dashboard');
   const { token } = useAuth();
 
   useEffect(() => {
     fetchStudents();
+    fetchProfessors();
   }, [token]);
 
   const fetchStudents = async () => {
@@ -26,6 +40,22 @@ const AdminDashboard = () => {
     } catch (error) {
       setError("Failed to fetch students");
       toast.error("Failed to fetch students");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchProfessors = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get("http://localhost:3000/api/professors_list", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProfessors(response.data);
+    } catch (error) {
+      setError("Failed to fetch professors");
+      toast.error("Failed to fetch professors");
     } finally {
       setIsLoading(false);
     }
@@ -66,10 +96,153 @@ const AdminDashboard = () => {
     }
   };
 
+  const SidebarLink = ({ icon: Icon, label, active, onClick }) => (
+    <button
+      onClick={onClick}
+      className={`flex w-full items-center space-x-2 rounded-lg px-4 py-3 text-left transition-colors ${
+        active
+          ? "bg-blue-50 text-blue-600"
+          : "text-gray-600 hover:bg-gray-50"
+      }`}
+    >
+      <Icon className="h-5 w-5" />
+      <span className="font-medium">{label}</span>
+      {active && <ChevronRight className="ml-auto h-4 w-4" />}
+    </button>
+  );
+
+  const DashboardView = () => (
+    <div className="space-y-6">
+      <div className="relative h-48 w-full overflow-hidden rounded-xl">
+        <img
+          src="https://images.shiksha.com/mediadata/images/1502278055phpGYzaMY.jpeg"
+          alt="Campus"
+          className="h-full w-full object-cover opacity-80"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20" />
+        <div className="absolute bottom-0 left-0 p-6">
+          <h1 className="text-3xl font-bold text-white">
+            Welcome to Admin Dashboard
+          </h1>
+        </div>
+      </div>
+
+      <div className="grid gap-6 sm:grid-cols-2">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-blue-600">Total Students</p>
+                <p className="mt-2 text-3xl font-bold text-blue-900">
+                  {students.length}
+                </p>
+              </div>
+              <UserCircle className="h-12 w-12 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-purple-600">
+                  Total Professors
+                </p>
+                <p className="mt-2 text-3xl font-bold text-purple-900">
+                  {professors.length}
+                </p>
+              </div>
+              <Users className="h-12 w-12 text-purple-600" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  const ProfessorsView = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800">Professors Directory</h2>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {professors.map((professor) => (
+          <Card key={professor._id} className="overflow-hidden">
+            <div className="relative h-48">
+              <img
+                src={professor.photo}
+                alt={`${professor.username}'s photo`}
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <CardContent className="p-4">
+              <h3 className="text-xl font-semibold text-gray-800">
+                {professor.username}
+              </h3>
+              <div className="mt-2 flex items-center text-gray-600">
+                <Mail className="mr-2 h-4 w-4" />
+                {professor.email}
+              </div>
+              <div className="mt-4 flex justify-end space-x-2">
+                <button className="rounded-lg bg-blue-50 px-3 py-2 text-blue-600 hover:bg-blue-100">
+                  <PencilIcon className="h-4 w-4" />
+                </button>
+                <button className="rounded-lg bg-red-50 px-3 py-2 text-red-600 hover:bg-red-100">
+                  <TrashIcon className="h-4 w-4" />
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+
+  const StudentsView = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800">Students Directory</h2>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {students.map((student) => (
+          <Card key={student._id} className="p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  {student.firstName} {student.lastName}
+                </h3>
+                <div className="mt-1 flex items-center text-sm text-gray-600">
+                  <Mail className="mr-2 h-4 w-4" />
+                  {student.userId.email}
+                </div>
+              </div>
+            </div>
+            <div className="mb-4">
+              <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+                Section {student.section}
+              </span>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setEditingStudent(student)}
+                className="rounded-lg bg-blue-50 px-3 py-2 text-blue-600 hover:bg-blue-100"
+              >
+                <PencilIcon className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => handleDelete(student._id)}
+                className="rounded-lg bg-red-50 px-3 py-2 text-red-600 hover:bg-red-100"
+              >
+                <TrashIcon className="h-4 w-4" />
+              </button>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
       </div>
     );
   }
@@ -83,101 +256,61 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6 lg:p-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="rounded-xl bg-white p-6 shadow-sm">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">
-              Student Management
-            </h2>
-            <p className="mt-1 text-sm text-gray-500">
-              Manage student information and records
-            </p>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full table-auto">
-              <thead>
-                <tr className="border-b bg-gray-50">
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
-                    Name
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
-                    Email
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
-                    Section
-                  </th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-600">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {students.map((student) => (
-                  <tr
-                    key={student._id}
-                    className="transition-colors hover:bg-gray-50"
-                  >
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-gray-900">
-                        {student.firstName} {student.lastName}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {student.userId.email}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {student.section}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => setEditingStudent(student)}
-                        className="mr-2 inline-flex items-center rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100"
-                      >
-                        <PencilIcon className="mr-1.5 h-4 w-4" />
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(student._id)}
-                        className="inline-flex items-center rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-100"
-                      >
-                        <TrashIcon className="mr-1.5 h-4 w-4" />
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar */}
+      <div className="w-64 border-r bg-white p-4">
+        <div className="mb-8">
+          <h1 className="text-xl font-bold text-gray-800">Admin Panel</h1>
         </div>
+        <nav className="space-y-2">
+          <SidebarLink
+            icon={LayoutDashboard}
+            label="Dashboard"
+            active={activeView === 'dashboard'}
+            onClick={() => setActiveView('dashboard')}
+          />
+          <SidebarLink
+            icon={Users}
+            label="Professors"
+            active={activeView === 'professors'}
+            onClick={() => setActiveView('professors')}
+          />
+          <SidebarLink
+            icon={GraduationCap}
+            label="Students"
+            active={activeView === 'students'}
+            onClick={() => setActiveView('students')}
+          />
+        </nav>
       </div>
 
-      {editingStudent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-            <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-gray-800">Edit Student</h3>
-              <button
-  onClick={() => setEditingStudent(null)}
-  className="rounded-lg p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
->
-  <X className="h-6 w-6" /> {/* Use X instead of XMarkIcon */}
-</button>
-            </div>
+      {/* Main Content */}
+      <div className="flex-1 p-8">
+        {activeView === 'dashboard' && <DashboardView />}
+        {activeView === 'professors' && <ProfessorsView />}
+        {activeView === 'students' && <StudentsView />}
+      </div>
 
+      {/* Edit Student Modal */}
+      {editingStudent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-800">Edit Student</h2>
+              <button
+                onClick={() => setEditingStudent(null)}
+                className="rounded-full bg-gray-100 p-1.5 text-gray-600 hover:bg-gray-200"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
             <form onSubmit={handleEdit} className="space-y-4">
               <div>
-                <label
-                  htmlFor="firstName"
-                  className="mb-1 block text-sm font-medium text-gray-700"
-                >
+                <label className="block text-sm font-medium text-gray-700">
                   First Name
                 </label>
                 <input
-                  id="firstName"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="text"
                   value={editingStudent.firstName}
                   onChange={(e) =>
                     setEditingStudent({
@@ -185,19 +318,15 @@ const AdminDashboard = () => {
                       firstName: e.target.value,
                     })
                   }
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
-
               <div>
-                <label
-                  htmlFor="lastName"
-                  className="mb-1 block text-sm font-medium text-gray-700"
-                >
+                <label className="block text-sm font-medium text-gray-700">
                   Last Name
                 </label>
                 <input
-                  id="lastName"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="text"
                   value={editingStudent.lastName}
                   onChange={(e) =>
                     setEditingStudent({
@@ -205,19 +334,31 @@ const AdminDashboard = () => {
                       lastName: e.target.value,
                     })
                   }
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
-
               <div>
-                <label
-                  htmlFor="section"
-                  className="mb-1 block text-sm font-medium text-gray-700"
-                >
+                <label className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={editingStudent.userId.email}
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      userId: { ...editingStudent.userId, email: e.target.value },
+                    })
+                  }
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
                   Section
                 </label>
                 <input
-                  id="section"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  type="text"
                   value={editingStudent.section}
                   onChange={(e) =>
                     setEditingStudent({
@@ -225,20 +366,13 @@ const AdminDashboard = () => {
                       section: e.target.value,
                     })
                   }
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
-
-              <div className="mt-6 flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setEditingStudent(null)}
-                  className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-                >
-                  Cancel
-                </button>
+              <div className="flex justify-end">
                 <button
                   type="submit"
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                  className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
                 >
                   Save Changes
                 </button>

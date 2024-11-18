@@ -5,6 +5,8 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
+// import ReactDOM from 'react-dom';
+// import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";

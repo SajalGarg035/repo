@@ -788,6 +788,19 @@ app.delete("/api/admin/student/:id",
 });
 
 // Professor Routes
+
+
+// In your server-side routes file (e.g., routes/admin.js)
+app.get('/api/professors_list', async (req, res) => {
+  try {
+    const professors = await User.find({ role: 'professor' });
+    res.json(professors);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch professors' });
+  }
+});
+
+
 app.get("/api/professor/schedules", 
   auth, 
   authorize(["professor"]), 
