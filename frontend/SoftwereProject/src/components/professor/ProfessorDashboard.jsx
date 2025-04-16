@@ -193,7 +193,7 @@ const ProfessorDashboard = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        'http://localhost:3000/api/professor/schedules',
+        'https://student-management-system-1-fqre.onrender.com/api/professor/schedules',
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -219,7 +219,7 @@ const ProfessorDashboard = () => {
     e.preventDefault();
     try {
       await axios.post(
-        'http://localhost:3000/api/professor/schedule',
+        'https://student-management-system-1-fqre.onrender.com/api/professor/schedule',
         newSchedule,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -561,7 +561,7 @@ const StudentList = ({ scheduleId, currentStudents, onUpdate }) => {
   const fetchAllStudents = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3000/api/admin/students",
+        "https://student-management-system-1-fqre.onrender.com/api/admin/students",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -585,7 +585,7 @@ const StudentList = ({ scheduleId, currentStudents, onUpdate }) => {
     e.preventDefault();
     try {
       await axios.put(
-        `http://localhost:3000/api/professor/schedule/${scheduleId}/students`,
+        `https://student-management-system-1-fqre.onrender.com/api/professor/schedule/${scheduleId}/students`,
         { students: selectedStudents },
         {
           headers: { Authorization: `Bearer ${token}` },

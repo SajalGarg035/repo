@@ -19,7 +19,7 @@ export default function ProfessorAttendance() {
     const fetchProfessorSchedules = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3000/api/professor/schedules', {
+        const response = await axios.get('https://student-management-system-1-fqre.onrender.com/api/professor/schedules', {
           headers: { Authorization: `Bearer ${token}` },
         });
         
@@ -39,7 +39,7 @@ export default function ProfessorAttendance() {
   const handleScheduleSelect = async (schedule) => {
     setSelectedSchedule(schedule);
     try {
-      const response = await axios.get(`http://localhost:3000/api/professor/schedule/${schedule._id}/students`, {
+      const response = await axios.get(`https://student-management-system-1-fqre.onrender.com/api/professor/schedule/${schedule._id}/students`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const studentsData = response.data.students;
@@ -67,7 +67,7 @@ export default function ProfessorAttendance() {
   const handleSaveAttendance = async () => {
     try {
       await axios.post(
-        `http://localhost:3000/api/professor/schedule/${selectedSchedule._id}/attendance`,
+        `https://student-management-system-1-fqre.onrender.com/api/professor/schedule/${selectedSchedule._id}/attendance`,
         { attendance },
         {
           headers: { Authorization: `Bearer ${token}` },
