@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import { useLoading } from '../../context/LoadingContext';
 import { toast } from 'react-toastify';
 
 const ProfileEdit = ({ studentInfo, onUpdate }) => {
@@ -11,10 +12,12 @@ const ProfileEdit = ({ studentInfo, onUpdate }) => {
   });
 
   const { token } = useAuth();
+  const { setLoading } = useLoading();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const response = await axios.put(
         'http://localhost:3000/api/student/profile',
         formData,
@@ -26,6 +29,8 @@ const ProfileEdit = ({ studentInfo, onUpdate }) => {
       onUpdate(response.data);
     } catch (error) {
       toast.error('Failed to update profile');
+    } finally {
+      setLoading(false);
     }
   };
 

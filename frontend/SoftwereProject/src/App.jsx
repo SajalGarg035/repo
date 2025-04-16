@@ -5,9 +5,8 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-// import ReactDOM from 'react-dom';
-// import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { LoadingProvider } from "./context/LoadingContext";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import ForgotPassword from "./components/auth/Resetpassword";
@@ -40,83 +39,85 @@ const PrivateRoute = ({ children, roles }) => {
 const App = () => {
   return (
     <AuthProvider>
-      <Router>
-        {/* Main Wrapper with Tailwind for min-height and background */}
-        <div className="min-h-screen bg-gray-100 d-flex flex-column">
-          <Navbar />
-          <div className="">
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route
-                path="/"
-                element={
-                  
-                    <LandingPage />
-                  
-                }
-              />
-              <Route
-                path="/student/dashboard"
-                element={
-                  <PrivateRoute roles={["student"]}>
-                    <StudentDashboard />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/professor/dashboard"
-                element={
-                  <PrivateRoute roles={["professor"]}>
-                    <ProfessorDashboard />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/professor/student"
-                element={
-                  <PrivateRoute roles={["professor"]}>
-                    <StudentList />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/admin/dashboard"
-                element={
-                  <PrivateRoute roles={["admin"]}>
-                    <AdminDashboard />
-                  </PrivateRoute>
-                }
-              />
-              <Route 
-                path = "/ForgotPassword"
-                element = {
-                  <ForgotPassword></ForgotPassword>
-                }
+      <LoadingProvider>
+        <Router>
+          {/* Main Wrapper with Tailwind for min-height and background */}
+          <div className="min-h-screen bg-gray-100 d-flex flex-column">
+            <Navbar />
+            <div className="">
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route
+                  path="/"
+                  element={
+                    
+                      <LandingPage />
+                    
+                  }
                 />
                 <Route
-                path="/ResetPassword"
-                element = {
-                  <ResetPassword></ResetPassword>
-                }
+                  path="/student/dashboard"
+                  element={
+                    <PrivateRoute roles={["student"]}>
+                      <StudentDashboard />
+                    </PrivateRoute>
+                  }
                 />
-            </Routes>
+                <Route
+                  path="/professor/dashboard"
+                  element={
+                    <PrivateRoute roles={["professor"]}>
+                      <ProfessorDashboard />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/professor/student"
+                  element={
+                    <PrivateRoute roles={["professor"]}>
+                      <StudentList />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/admin/dashboard"
+                  element={
+                    <PrivateRoute roles={["admin"]}>
+                      <AdminDashboard />
+                    </PrivateRoute>
+                  }
+                />
+                <Route 
+                  path = "/ForgotPassword"
+                  element = {
+                    <ForgotPassword></ForgotPassword>
+                  }
+                  />
+                  <Route
+                  path="/ResetPassword"
+                  element = {
+                    <ResetPassword></ResetPassword>
+                  }
+                  />
+              </Routes>
+            </div>
+            {/* Toast notifications */}
+            <ToastContainer
+              position="top-center"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="colored"
+            />
           </div>
-          {/* Toast notifications */}
-          <ToastContainer
-            position="top-center"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="colored"
-          />
-        </div>
-      </Router>
+        </Router>
+      </LoadingProvider>
     </AuthProvider>
   );
 };

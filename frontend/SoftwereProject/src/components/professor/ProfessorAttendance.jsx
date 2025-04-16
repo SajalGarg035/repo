@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { useAuth } from '../../context/AuthContext'
+import { useLoading } from '../../context/LoadingContext'
 import axios from 'axios'
 import '../../App.css';
 
@@ -12,10 +13,12 @@ export default function ProfessorAttendance() {
   const [students, setStudents] = useState([]);
   const [attendance, setAttendance] = useState([]);
   const { token } = useAuth();
+  const { setLoading } = useLoading();
 
   useEffect(() => {
     const fetchProfessorSchedules = async () => {
       try {
+        setLoading(true);
         const response = await axios.get('http://localhost:3000/api/professor/schedules', {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -26,10 +29,12 @@ export default function ProfessorAttendance() {
         console.error('Failed to fetch professor schedules:', error);
         toast.error('Failed to fetch professor schedules');
         setSchedules([]); // Set to empty array on failure
+      } finally {
+        setLoading(false);
       }
     };
     fetchProfessorSchedules();
-  }, [token]);
+  }, [token, setLoading]);
 
   const handleScheduleSelect = async (schedule) => {
     setSelectedSchedule(schedule);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
+import { useLoading } from "../../context/LoadingContext";
 import { toast } from "react-toastify";
 import {
   PencilIcon,
@@ -23,6 +24,7 @@ const AdminDashboard = () => {
   const [error, setError] = useState(null);
   const [activeView, setActiveView] = useState('dashboard');
   const { token } = useAuth();
+  const { setLoading } = useLoading();
 
   useEffect(() => {
     fetchStudents();
@@ -49,7 +51,7 @@ const AdminDashboard = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get("http://localhost:3000/api/professors_list", {
+      const response = await axios.get("http://localhost:3000/api/admin/professors_list", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProfessors(response.data);
@@ -210,13 +212,15 @@ const AdminDashboard = () => {
                 </h3>
                 <div className="mt-1 flex items-center text-sm text-gray-600">
                   <Mail className="mr-2 h-4 w-4" />
-                  {student.userId.email}
+                  {/* Add null check for userId and email */}
+                  {student.userId && student.userId.email ? student.userId.email : "No email available"}
                 </div>
               </div>
             </div>
             <div className="mb-4">
               <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
-                Section {student.section}
+                {/* Add null check for section */}
+                Section {student.section || "N/A"}
               </span>
             </div>
             <div className="flex justify-end space-x-2">
@@ -343,14 +347,18 @@ const AdminDashboard = () => {
                 </label>
                 <input
                   type="email"
-                  value={editingStudent.userId.email}
+                  // Add null check for userId and email
+                  value={editingStudent.userId ? editingStudent.userId.email : ''}
                   onChange={(e) =>
                     setEditingStudent({
                       ...editingStudent,
-                      userId: { ...editingStudent.userId, email: e.target.value },
+                      // Ensure userId exists before updating email
+                      userId: editingStudent.userId ? { ...editingStudent.userId, email: e.target.value } : { email: e.target.value },
                     })
                   }
                   className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+                  // Consider making email read-only if it shouldn't be edited here
+                  // readOnly
                 />
               </div>
               <div>
@@ -359,7 +367,8 @@ const AdminDashboard = () => {
                 </label>
                 <input
                   type="text"
-                  value={editingStudent.section}
+                  // Add null check for section
+                  value={editingStudent.section || ''}
                   onChange={(e) =>
                     setEditingStudent({
                       ...editingStudent,

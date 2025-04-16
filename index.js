@@ -15,6 +15,8 @@ const path = require('path');  // Import the path module
 const fs = require('fs').promises;
 
 
+app.use(express.json()); // ⬅️ this parses incoming JSON
+app.use(express.urlencoded({ extended: true })); // optional, for form data
 
 
 
@@ -65,12 +67,8 @@ cloudinary.config({
 
 
 // Middleware
-app.use(cors({
-  origin:'http://localhost:5173',
-  credentials:true,
-  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE']
-}));
-app.use(express.json());
+app.use(cors());
+
 
 
 mongoose
@@ -155,6 +153,7 @@ const studentSchema = new mongoose.Schema({
     required: [true, 'Date of birth is required'],
     max: [new Date(), 'Date of birth cannot be in the future']
   },
+
   enrollmentDate: {
     type: Date,
     default: Date.now
@@ -305,7 +304,9 @@ app.post("/api/register", upload.single('photo'), registerValidation, async (req
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    console.log(req.file);
+    console.log("Body:", req.body);
+console.log("File:", req.file);
+
     
     const { username, password, email, role } = req.body;
     const photo = req.file.path;

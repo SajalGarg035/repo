@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useLoading } from '../../context/LoadingContext';
 import { 
   Calendar, Clock, User, Book, CheckCircle, XCircle, Edit, Info, List, Menu, X 
 } from 'lucide-react';
@@ -10,6 +11,7 @@ const StudentDashboard = () => {
   const [schedules, setSchedules] = useState([]);
   const [studentInfo, setStudentInfo] = useState(null);
   const { token } = useAuth();
+  const { setLoading } = useLoading();
   
   // New state for managing sidebar and active section
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -18,6 +20,7 @@ const StudentDashboard = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
+        setLoading(true);
         const response = await fetch('http://localhost:3000/api/student/dashboard', {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -26,10 +29,12 @@ const StudentDashboard = () => {
         setStudentInfo(data.student);
       } catch (error) {
         console.error('Failed to fetch dashboard data');
+      } finally {
+        setLoading(false);
       }
     };
     fetchDashboard();
-  }, [token]);
+  }, [token, setLoading]);
 
   const handleProfileUpdate = (updatedStudent) => {
     setStudentInfo(updatedStudent);

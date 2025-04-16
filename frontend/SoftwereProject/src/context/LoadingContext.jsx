@@ -7,7 +7,7 @@ export const LoadingProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
 
   return (
-    <LoadingContext.Provider value={{ setLoading }}>
+    <LoadingContext.Provider value={{ loading, setLoading }}>
       {loading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <LoadingSpinner />

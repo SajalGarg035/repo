@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLoading } from '../../context/LoadingContext';
 import { toast } from 'react-toastify';
 import { Lock, User, Loader2 } from 'lucide-react';
 
@@ -8,11 +9,13 @@ const Login = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const { setLoading } = useLoading();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setLoading(true);
     try {
       const user = await login(credentials.username, credentials.password);
       toast.success('Login successful!');
@@ -23,6 +26,7 @@ const Login = () => {
       toast.error(error.message);
     } finally {
       setIsLoading(false);
+      setLoading(false);
     }
   };
 

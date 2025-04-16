@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLoading } from '../../context/LoadingContext';
 import { toast } from 'react-toastify';
 import { User, Mail, Lock, Calendar, Upload, UserCircle } from 'lucide-react';
+import axios from 'axios';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -17,7 +19,8 @@ const Register = () => {
   const [photo, setPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
 
-  const { register } = useAuth();
+  const { register } = useAuth(); // Remove 'uploads' from here if it's not used elsewhere
+  const { setLoading } = useLoading();
   const navigate = useNavigate();
 
   const handleFileChange = (e) => {
@@ -32,26 +35,50 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const formDataToSend = new FormData();
+      setLoading(true);
       
-      Object.keys(formData).forEach((key) => {
-        formDataToSend.append(key, formData[key]);
-      });
+      // Append all form data fields
+      // Object.keys(formData).forEach((key) => {
+      //   // Only append student-specific fields if the role is student
+      //   if (['firstName', 'lastName', 'dateOfBirth'].includes(key) && formData.role !== 'student') {
+      //     return; // Skip non-student fields if role is not student
+      //   }
+      //   userData.append(key, formData[key]);
+      // });
+
+
+      console.log(formData);
+
+      var userData=formData;
       
+      
+      // Append photo if selected
       if (photo) {
-        formDataToSend.append('photo', photo);
+        userData={
+          ...userData,
+          photo: photo,
+        }
       }
 
-      await register(formDataToSend);
-      if(formDataToSend.role == 'student'){
-        const response = await axios.post('http://localhost:3000/api/uploads', formDataToSend);
-        if(response.status == 200){
-          console.log("sdhajhdfdshfohdf")
-        }}
+      console.log(userData);
+      
+
+      // Single call to register endpoint
+      await register(userData); 
+      
+      // Removed the conditional uploads call:
+      // if(formData.role === 'student'){
+      //   await uploads(formDataToSend); 
+      // }
+
       toast.success('Registration successful!');
       navigate('/login');
     } catch (error) {
+      // Log the detailed error for debugging
+      console.error("Registration Error:", error); 
       toast.error(error.message || 'Registration failed');
+    } finally {
+      setLoading(false);
     }
   };
 
