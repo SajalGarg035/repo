@@ -45,7 +45,7 @@ const MarkAttendance = () => {
       setError(null);
       
       // Step 4: POST the updated attendance data to the server
-      const response = await axios.get('https://student-management-system-1-fqre.onrender.com/mark_attendance');
+      const response = await axios.get('http://localhost:5000/api/mark_attendance');
       console.log(response);
     } catch (err) {
       setError('Failed to submit attendance data.');

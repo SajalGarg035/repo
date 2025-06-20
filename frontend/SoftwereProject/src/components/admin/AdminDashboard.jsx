@@ -35,7 +35,7 @@ const AdminDashboard = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get("https://student-management-system-1-fqre.onrender.com/api/admin/students", {
+      const response = await axios.get("http://localhost:5000/api/admin/students", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setStudents(response.data);
@@ -51,7 +51,7 @@ const AdminDashboard = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get("https://student-management-system-1-fqre.onrender.com/api/admin/professors_list", {
+      const response = await axios.get("http://localhost:5000/api/admin/professors_list", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProfessors(response.data);
@@ -67,7 +67,7 @@ const AdminDashboard = () => {
     e.preventDefault();
     try {
       await axios.put(
-        `https://student-management-system-1-fqre.onrender.com/api/admin/student/${editingStudent._id}`,
+        `http://localhost:5000/api/admin/student/${editingStudent._id}`,
         editingStudent,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -85,7 +85,7 @@ const AdminDashboard = () => {
     if (window.confirm("Are you sure you want to delete this student?")) {
       try {
         await axios.delete(
-          `https://student-management-system-1-fqre.onrender.com/api/admin/student/${studentId}`,
+          `http://localhost:5000/api/admin/student/${studentId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

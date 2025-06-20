@@ -17,7 +17,7 @@ const StudentList = ({ scheduleId, currentStudents, onUpdate }) => {
   const fetchAllStudents = async () => {
     try {
       const response = await axios.get(
-        "https://student-management-system-1-fqre.onrender.com/api/admin/students",
+        "http://localhost:5000/api/admin/students",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -32,7 +32,7 @@ const StudentList = ({ scheduleId, currentStudents, onUpdate }) => {
     e.preventDefault();
     try {
       await axios.put(
-        `https://student-management-system-1-fqre.onrender.com/api/professor/schedule/${scheduleId}/students`,
+        `http://localhost:5000/api/professor/schedule/${scheduleId}/students`,
         { students: selectedStudents },
         {
           headers: { Authorization: `Bearer ${token}` },

@@ -19,7 +19,7 @@ const ProfileEdit = ({ studentInfo, onUpdate }) => {
     try {
       setLoading(true);
       const response = await axios.put(
-        'https://student-management-system-1-fqre.onrender.com/api/student/profile',
+        'http://localhost:5000/api/api/student/profile',
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },

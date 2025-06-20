@@ -290,5 +290,29 @@ router.get("/schedule/:id/attendance-report", auth, authorize(["professor"]), as
     next(error);
   }
 });
+// Add this route with the other professor routes (around line 450-500)
+router.get(
+  "/students",
+  auth,
+  authorize(["professor"]),
+  async (req, res, next) => {
+    try {
+      const students = await Student.find()
+        .populate("userId", "username email")
+        .lean();
+
+      res.json({
+        message: 'Students retrieved successfully',
+        students
+      });
+    } catch (error) {
+      console.error("Failed to fetch students for professor:", error);
+      res.status(500).json({ 
+        error: 'Internal Server Error',
+        message: 'Failed to fetch students'
+      });
+    }
+  }
+);
 
 module.exports = router;

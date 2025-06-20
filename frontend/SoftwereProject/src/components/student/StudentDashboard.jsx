@@ -21,7 +21,7 @@ const StudentDashboard = () => {
     const fetchDashboard = async () => {
       try {
         setLoading(true);
-        const response = await fetch('https://student-management-system-1-fqre.onrender.com/api/student/dashboard', {
+        const response = await fetch('http://localhost:5000/api/student/dashboard', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();

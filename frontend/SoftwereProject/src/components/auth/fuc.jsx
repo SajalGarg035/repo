@@ -20,7 +20,7 @@ const ResetPassword = () => {
         };
 
         try {
-            const response = await fetch('https://student-management-system-1-fqre.onrender.com/api/verifyfpcode', {
+            const response = await fetch('http://localhost:5000/api/verifyfpcode', {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',

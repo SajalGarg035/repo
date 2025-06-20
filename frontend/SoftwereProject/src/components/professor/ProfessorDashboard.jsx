@@ -193,16 +193,16 @@ const ProfessorDashboard = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        'https://student-management-system-1-fqre.onrender.com/api/professor/schedules',
+        'http://localhost:5000/api/professor/schedules',
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      // Ensure response.data is an array
-      if (Array.isArray(response.data)) {
-        setSchedules(response.data);
+      // Access the schedules array from the response object
+      if (response.data && Array.isArray(response.data.schedules)) {
+        setSchedules(response.data.schedules);
       } else {
-        console.error("API did not return an array for schedules:", response.data);
+        console.error("API did not return valid schedule data:", response.data);
         setSchedules([]); // Default to empty array if not an array
         toast.error('Received invalid schedule data format');
       }
@@ -219,7 +219,7 @@ const ProfessorDashboard = () => {
     e.preventDefault();
     try {
       await axios.post(
-        'https://student-management-system-1-fqre.onrender.com/api/professor/schedule',
+        'http://localhost:5000/api/professor/schedule',
         newSchedule,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -561,16 +561,18 @@ const StudentList = ({ scheduleId, currentStudents, onUpdate }) => {
   const fetchAllStudents = async () => {
     try {
       const response = await axios.get(
-        "https://student-management-system-1-fqre.onrender.com/api/admin/students",
+        "http://localhost:5000/api/professor/students", // Changed from admin to professor
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      // Ensure response.data is an array
+      // Check if the response has a students array property or is directly an array
       if (Array.isArray(response.data)) {
         setAllStudents(response.data);
+      } else if (response.data && Array.isArray(response.data.students)) {
+        setAllStudents(response.data.students);
       } else {
-        console.error("API did not return an array for all students:", response.data);
+        console.error("API did not return valid student data:", response.data);
         setAllStudents([]); // Default to empty array
         toast.error("Received invalid student data format");
       }
@@ -580,12 +582,11 @@ const StudentList = ({ scheduleId, currentStudents, onUpdate }) => {
       setAllStudents([]); // Default to empty array on error
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await axios.put(
-        `https://student-management-system-1-fqre.onrender.com/api/professor/schedule/${scheduleId}/students`,
+        `http://localhost:5000/api/professor/schedule/${scheduleId}/students`,
         { students: selectedStudents },
         {
           headers: { Authorization: `Bearer ${token}` },

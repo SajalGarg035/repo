@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post('https://student-management-system-1-fqre.onrender.com/api/login', {
+      const response = await axios.post('http://localhost:5000/api/login', {
         username,
         password,
       });
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
       // }
       
       // The Content-Type header is automatically set to multipart/form-data by axios when sending FormData
-      const response = await axios.post('https://student-management-system-1-fqre.onrender.com/api/register', userData);
+      const response = await axios.post('http://localhost:5000/api/register', userData);
       const { user, token } = response.data;
       setUser(user);
       setToken(token);
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
   
   const uploads = async (userData) => {
   try{
-    const response = await axios.post('https://student-management-system-1-fqre.onrender.com/api/uploads', userData);
+    const response = await axios.post('http://localhost:5000/api/uploads', userData);
     return response.data;
   }
   catch (error) {

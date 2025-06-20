@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 module.exports = {
-  PORT: process.env.PORT || 3000,
+  PORT: process.env.PORT || 5000,
   JWT_SECRET: process.env.JWT_SECRET || "your_jwt_secret",
   MONGODB_URI: process.env.MONGODB_URI || "mongodb+srv://sajalgarg2006:sajal123@cluster0.urmyxu4.mongodb.net/?retryWrites=true&w=majority",
   SALT_ROUNDS: 10,
@@ -12,5 +12,5 @@ module.exports = {
     api_key: process.env.CLOUDINARY_API_KEY || "437619521957416",
     api_secret: process.env.CLOUDINARY_API_SECRET || "IJm6Pdn2_aH-xaqwNvXkuUHYbN8"
   },
-  BASE_URL: process.env.BASE_URL || "http://localhost:3000"
+  BASE_URL: process.env.BASE_URL || "http://localhost:5000"
 };

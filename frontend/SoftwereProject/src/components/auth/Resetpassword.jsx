@@ -18,7 +18,7 @@ const ForgotPassword = () => {
     
     setIsLoading(true);
     try {
-      const response = await fetch('https://student-management-system-1-fqre.onrender.com/api/sendfpcode', {
+      const response = await fetch('http://localhost:5000/api/sendfpcode', {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
