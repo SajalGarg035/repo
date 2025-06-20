@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLoading } from '../../context/LoadingContext';
 import { 
-  Calendar, Clock, User, Book, CheckCircle, XCircle, Edit, Info, List, Menu, X 
+  Calendar, Clock, User, Book, CheckCircle, XCircle, Edit, Info, List, Menu, X, QrCode 
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import ProfileEdit from './ProfileEdit';
+import QRAttendanceScanner from './QRAttendanceScanner';
 
 const StudentDashboard = () => {
   const [schedules, setSchedules] = useState([]);
@@ -88,6 +89,19 @@ const StudentDashboard = () => {
               >
                 <List className="w-5 h-5 mr-3" />
                 Classes
+              </button>
+            </li>
+            <li>
+              <button 
+                onClick={() => setActiveSection('qr-attendance')}
+                className={`
+                  w-full flex items-center p-2 
+                  ${activeSection === 'qr-attendance' ? 'bg-blue-100 text-blue-800' : 'text-gray-700 hover:bg-gray-200'}
+                  rounded-lg
+                `}
+              >
+                <QrCode className="w-5 h-5 mr-3" />
+                QR Attendance
               </button>
             </li>
             <li>
@@ -241,6 +255,22 @@ const StudentDashboard = () => {
                     </div>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {activeSection === 'qr-attendance' && (
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <QrCode className="w-5 h-5" />
+                  QR Code Attendance
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <QRAttendanceScanner />
               </CardContent>
             </Card>
           </div>

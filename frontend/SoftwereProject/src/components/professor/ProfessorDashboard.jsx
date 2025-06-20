@@ -11,11 +11,13 @@ import {
   LogOut,
   Settings,
   ChevronDown,
-  Menu
+  Menu,
+  QrCode
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLoading } from '../../context/LoadingContext';
 import ProfessorAttendance from './ProfessorAttendance';
+import QRAttendanceManager from './QRAttendanceManager';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
@@ -97,7 +99,7 @@ const ScheduleSummary = ({ schedules }) => {
 };
 
 // Create Quick Actions Component (Moved up for clarity)
-const QuickActions = () => {
+const QuickActions = ({ setActiveTab }) => {
   return (
     <Card className="shadow-lg">
       <CardHeader>
@@ -105,13 +107,19 @@ const QuickActions = () => {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">
-          <button className="p-4 bg-blue-50 rounded-lg text-blue-700 hover:bg-blue-100 transition-colors">
+          <button 
+            onClick={() => setActiveTab('attendance')}
+            className="p-4 bg-blue-50 rounded-lg text-blue-700 hover:bg-blue-100 transition-colors"
+          >
             <Users className="w-6 h-6 mb-2 mx-auto" />
             <span className="text-sm">Take Attendance</span>
           </button>
-          <button className="p-4 bg-green-50 rounded-lg text-green-700 hover:bg-green-100 transition-colors">
-            <Book className="w-6 h-6 mb-2 mx-auto" />
-            <span className="text-sm">Add Class</span>
+          <button 
+            onClick={() => setActiveTab('qr-attendance')}
+            className="p-4 bg-green-50 rounded-lg text-green-700 hover:bg-green-100 transition-colors"
+          >
+            <QrCode className="w-6 h-6 mb-2 mx-auto" />
+            <span className="text-sm">QR Attendance</span>
           </button>
         </div>
       </CardContent>
@@ -120,7 +128,7 @@ const QuickActions = () => {
 };
 
 // Add these components to the Dashboard tab content (Moved up for clarity)
-const DashboardContent = ({ schedules }) => {
+const DashboardContent = ({ schedules, setActiveTab }) => {
   // Ensure schedules is an array before reducing or filtering
   const totalStudents = Array.isArray(schedules) ? schedules.reduce((acc, curr) => acc + (curr.students?.length || 0), 0) : 0;
   const activeClasses = Array.isArray(schedules) ? schedules.length : 0;
@@ -162,7 +170,7 @@ const DashboardContent = ({ schedules }) => {
           <ScheduleSummary schedules={schedules} />
         </div>
         <div>
-          <QuickActions />
+          <QuickActions setActiveTab={setActiveTab} />
         </div>
       </div>
     </div>
@@ -288,9 +296,15 @@ const ProfessorDashboard = () => {
             />
             <SidebarLink 
               icon={Users} 
-              text="Attendance" 
+              text="Manual Attendance" 
               active={activeTab === 'attendance'}
               onClick={() => setActiveTab('attendance')}
+            />
+            <SidebarLink 
+              icon={QrCode} 
+              text="QR Attendance" 
+              active={activeTab === 'qr-attendance'}
+              onClick={() => setActiveTab('qr-attendance')}
             />
           </div>
 
@@ -324,7 +338,7 @@ const ProfessorDashboard = () => {
           {activeTab === 'dashboard' && (
             <div className="space-y-8">
               {/* Dashboard Content (Stats, Summary, Actions) */}
-              <DashboardContent schedules={schedules} />
+              <DashboardContent schedules={schedules} setActiveTab={setActiveTab} />
 
               {/* Create Schedule Form and Class List */}
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -532,10 +546,21 @@ const ProfessorDashboard = () => {
           {activeTab === 'attendance' && (
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle>Manage Attendance</CardTitle>
+                <CardTitle>Manual Attendance</CardTitle>
               </CardHeader>
               <CardContent>
                 <ProfessorAttendance />
+              </CardContent>
+            </Card>
+          )}
+
+          {activeTab === 'qr-attendance' && (
+            <Card className="shadow-lg">
+              <CardHeader>
+                <CardTitle>QR Code Attendance Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <QRAttendanceManager />
               </CardContent>
             </Card>
           )}

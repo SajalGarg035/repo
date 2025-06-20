@@ -10,6 +10,7 @@ const studentRoutes = require('./routes/studentRoutes');
 const professorRoutes = require('./routes/professorRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const qrAttendanceRoutes = require('./routes/qrAttendanceRoutes');
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use('/api/student', studentRoutes);
 app.use('/api/professor', professorRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api', uploadRoutes);
+app.use('/api/qr-attendance', qrAttendanceRoutes);
 
 // Error Handler
 app.use(errorHandler);
